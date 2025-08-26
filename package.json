@@ -1,0 +1,23 @@
+{
+  "name": "vocabloai",
+  "version": "1.0.0",
+  "description": "**VocabloAI** is an AI-powered vocabulary assistant that helps users quickly learn new words. Users can input any word and receive:",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "openai": "^5.15.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
