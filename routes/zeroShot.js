@@ -15,12 +15,14 @@ function cleanJSON(text) {
     .trim();
 }
 
+
 router.post("/", async (req, res) => {
   try {
     const { word } = req.body;
     if (!word) {
       return res.status(400).json({ error: "Please provide a word" });
     }
+
 
     const prompt = `
 You are an intelligent vocabulary assistant.
@@ -41,6 +43,22 @@ Now generate the JSON for the word: "${word}"
     const response = await model.generateContent(prompt);
 
     const aiMessage = response.response.text();
+
+
+    const prompt = `Give me the definition, synonyms, antonyms, 
+    and an example sentence for the word "${word}". 
+    Format it as:
+    Definition: ...
+    Synonyms: ...
+    Antonyms: ...
+    Example: ...`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.7,
+    });
+
 
     let parsed;
     try {
