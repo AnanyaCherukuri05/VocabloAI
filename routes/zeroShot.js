@@ -9,7 +9,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// POST /api/zero-shot
 router.post("/", async (req, res) => {
   try {
     const { word } = req.body;
@@ -17,7 +16,6 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Please provide a word" });
     }
 
-    // Zero-Shot Prompt
     const prompt = `Give me the definition, synonyms, antonyms, 
     and an example sentence for the word "${word}". 
     Format it as:
