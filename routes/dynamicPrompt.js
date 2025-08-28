@@ -1,12 +1,11 @@
 import express from "express";
-import OpenAI from "openai";
+import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
+dotenv.config();
 const router = express.Router();
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
-});
-
+const client = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 /**
  * @param {string} word - the vocabulary word
@@ -28,15 +27,12 @@ async function getDynamicPrompt(word, difficulty = "medium", style = "simple") {
 
     const userPrompt = `Explain the word: "${word}"`;
 
-    const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-    });
+    const prompt = `${systemPrompt}\n\n${userPrompt}`;
 
-    return response.choices[0].message.content.trim();
+    const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await model.generateContent(prompt);
+
+    return response.response.text().trim();
   } catch (error) {
     console.error("Dynamic Prompt Error:", error);
     throw new Error("Failed to generate response");
@@ -52,7 +48,5 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
 
 export default router;
