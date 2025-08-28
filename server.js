@@ -6,6 +6,7 @@ import systemUserPrompt from "./routes/systemUserPrompt.js";
 import dynamicPrompt from "./routes/dynamicPrompt.js";
 import oneShotRouter from "./routes/oneShotPrompt.js";
 import multiShotRouter from "./routes/fewShotPrompt.js";
+import cotPromptRouter from "./routes/COTPrompting.js";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.use("/api/systemuser", systemUserPrompt);
 app.use("/api/dynamic-prompt", dynamicPrompt);
 app.use("/api/one-shot", oneShotRouter);
 app.use("/api/few-shot", multiShotRouter);
+app.use("/api/cot-prompt", cotPromptRouter);
+
 
 
 
