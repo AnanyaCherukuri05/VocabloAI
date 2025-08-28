@@ -1,13 +1,19 @@
 import express from "express";
-import OpenAI from "openai";
 import dotenv from "dotenv";
-dotenv.config();
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
+dotenv.config();
 const router = express.Router();
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+
+// 🔹 helper to strip markdown ```json blocks
+function cleanJSON(text) {
+  return text
+    .replace(/```json/gi, "")
+    .replace(/```/g, "")
+    .trim();
+}
 
 router.post("/", async (req, res) => {
   try {
@@ -16,36 +22,44 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Please provide a word" });
     }
 
-    const prompt = `Give me the definition, synonyms, antonyms, 
-    and an example sentence for the word "${word}". 
-    Format it as:
-    Definition: ...
-    Synonyms: ...
-    Antonyms: ...
-    Example: ...`;
+    const prompt = `
+You are an intelligent vocabulary assistant.
+ONLY respond in strict JSON format, with no extra text, no Markdown, no explanations.
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-    });
+The JSON should look like this:
+{
+  "definition": "string",
+  "synonyms": ["string", "string", ...],
+  "antonyms": ["string", "string", ...],
+  "example": "string"
+}
 
-    if (
-      !response.choices ||
-      !response.choices[0] ||
-      !response.choices[0].message ||
-      !response.choices[0].message.content
-    ) {
-      return res.status(500).json({ error: "Invalid response from OpenAI" });
+Now generate the JSON for the word: "${word}"
+`;
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await model.generateContent(prompt);
+
+    const aiMessage = response.response.text();
+
+    let parsed;
+    try {
+      const cleanText = cleanJSON(aiMessage);
+      parsed = JSON.parse(cleanText);
+    } catch (err) {
+      return res.json({
+        raw: aiMessage,
+        note: "Could not parse JSON, check output format.",
+      });
     }
 
     res.json({
       word,
-      result: response.choices[0].message.content,
+      ...parsed,
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("Gemini API Error:", err);
+    res.status(500).json({ error: "Something went wrong with Gemini API" });
   }
 });
 

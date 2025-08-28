@@ -7,13 +7,6 @@ const router = express.Router();
 
 const client = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-function cleanJSON(text) {
-  return text
-    .replace(/```json/gi, "")
-    .replace(/```/g, "") 
-    .trim();
-}
-
 router.post("/", async (req, res) => {
   try {
     const { word } = req.body;
@@ -22,28 +15,43 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Word is required" });
     }
 
+    // One-shot example
+    const example = `
+Example:
+Word: "serendipity"
+Output:
+{
+  "definition": "the occurrence of events by chance in a happy or beneficial way",
+  "synonyms": ["luck", "chance", "fortune", "fluke"],
+  "antonyms": ["misfortune", "bad luck"],
+  "usageExample": "By sheer serendipity, she found her lost wallet in the park."
+}
+`;
+
     const prompt = `
-      You are an intelligent vocabulary assistant. 
-      Always respond in valid JSON with the following keys:
-      {
-        "definition": "...",
-        "synonyms": ["..."],
-        "antonyms": ["..."],
-        "usageExample": "..."
-      }
-      
-      Word: "${word}"
-    `;
+You are VocabloAI, a smart vocabulary assistant.
+Always respond ONLY in valid JSON.
+
+Task: Provide definition, synonyms, antonyms, and example sentence for the word.
+
+${example}
+
+Now generate for the word: "${word}"
+`;
 
     const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
     const response = await model.generateContent(prompt);
 
-    const aiMessage = response.response.text();
+    let aiMessage = response.response.text().trim();
+
+    // Clean JSON if wrapped in ```json ... ```
+    if (aiMessage.startsWith("```")) {
+      aiMessage = aiMessage.replace(/```json|```/g, "").trim();
+    }
 
     let parsed;
     try {
-      const cleanText = cleanJSON(aiMessage);
-      parsed = JSON.parse(cleanText);
+      parsed = JSON.parse(aiMessage);
     } catch (err) {
       return res.json({
         raw: aiMessage,
@@ -51,10 +59,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    res.json({
-      word,
-      ...parsed,
-    });
+    res.json(parsed);
   } catch (error) {
     console.error("Gemini API Error:", error);
     res.status(500).json({ error: error.message });
