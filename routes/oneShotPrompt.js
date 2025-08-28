@@ -14,8 +14,6 @@ router.post("/", async (req, res) => {
     if (!word) {
       return res.status(400).json({ error: "Word is required" });
     }
-
-    // One-shot example
     const example = `
 Example:
 Word: "serendipity"
