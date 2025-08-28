@@ -47,16 +47,6 @@ async function generateVocabEntry(word) {
     }
   });
 
-  const raw = result.response.text();
-  let parsed;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (e) {
-    throw new Error("Invalid JSON returned from Gemini.");
-  }
-
-  return VocabSchema.parse(parsed);
-}
 
 router.post("/structured/vocab", async (req, res) => {
   try {
@@ -71,5 +61,17 @@ router.post("/structured/vocab", async (req, res) => {
     return res.status(500).json({ error: err.message || "Something went wrong." });
   }
 });
+
+  const raw = result.response.text();
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (e) {
+    throw new Error("Invalid JSON returned from Gemini.");
+  }
+
+  return VocabSchema.parse(parsed);
+}
+
 
 export default router;
