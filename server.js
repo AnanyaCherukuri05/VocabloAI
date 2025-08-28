@@ -8,6 +8,7 @@ import oneShotRouter from "./routes/oneShotPrompt.js";
 import multiShotRouter from "./routes/fewShotPrompt.js";
 import cotPromptRouter from "./routes/COTPrompting.js";
 import functionCall from "./routes/functionCalling.js";
+import structuredOutput from "./routes/structuredOutput.js";
 
 dotenv.config();
 
@@ -22,6 +23,8 @@ app.use("/api/one-shot", oneShotRouter);
 app.use("/api/few-shot", multiShotRouter);
 app.use("/api/cot-prompt", cotPromptRouter);
 app.use("/api/function-call", functionCall);
+app.use("/api/structured", structuredOutput);
+
 
 
 
