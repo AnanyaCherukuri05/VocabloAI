@@ -9,6 +9,7 @@ import multiShotRouter from "./routes/fewShotPrompt.js";
 import cotPromptRouter from "./routes/COTPrompting.js";
 import functionCall from "./routes/functionCalling.js";
 import structuredOutput from "./routes/structuredOutput.js";
+import vocabOracle from "./routes/vocabOracle.js";
 
 dotenv.config();
 
@@ -24,8 +25,7 @@ app.use("/api/few-shot", multiShotRouter);
 app.use("/api/cot-prompt", cotPromptRouter);
 app.use("/api/function-call", functionCall);
 app.use("/api/structured", structuredOutput);
-
-
+app.use("/api/vocab-oracle", vocabOracle);
 
 
 
