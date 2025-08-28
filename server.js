@@ -7,6 +7,7 @@ import dynamicPrompt from "./routes/dynamicPrompt.js";
 import oneShotRouter from "./routes/oneShotPrompt.js";
 import multiShotRouter from "./routes/fewShotPrompt.js";
 import cotPromptRouter from "./routes/COTPrompting.js";
+import functionCall from "./routes/functionCalling.js";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use("/api/dynamic-prompt", dynamicPrompt);
 app.use("/api/one-shot", oneShotRouter);
 app.use("/api/few-shot", multiShotRouter);
 app.use("/api/cot-prompt", cotPromptRouter);
+app.use("/api/function-call", functionCall);
 
 
 
