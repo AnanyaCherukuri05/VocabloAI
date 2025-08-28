@@ -9,12 +9,14 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+
 router.post("/", async (req, res) => {
   try {
     const { word } = req.body;
     if (!word) {
       return res.status(400).json({ error: "Please provide a word" });
     }
+
 
     const prompt = `Give me the definition, synonyms, antonyms, 
     and an example sentence for the word "${word}". 
